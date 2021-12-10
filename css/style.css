@@ -1,6 +1,7 @@
 
 :root {
-    --tam-extra-pequeno : 32px;
+    --tam-extra-extra-pequeno : 32px;
+    --tam-extra-pequeno : 40px;
     --tam-pequeno : 48px;
     --tam-medio : 64px;
     --tam-grande : 96px;
@@ -34,30 +35,42 @@ body {
 }
 
 
-@media (min-width: 701px) {
+@media (min-width: 769px) {
     .tabuleiro {
         grid-template-columns: var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande);
+
         grid-template-rows: var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande);
     }
 }
 
-@media (min-width: 501px) and (max-width: 700px) {
+@media (max-width: 768px) and (min-width: 513px) {
     .tabuleiro {
         grid-template-columns: var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio);
+
         grid-template-rows: var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio);
     }
 }
 
-@media (max-width: 500px) and (min-width: 401px) {
+@media (max-width: 512px) and (min-width: 385px) {
     .tabuleiro {
         grid-template-columns: var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno);
+
         grid-template-rows: var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno);
     }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 384px) and (min-width: 321px) {
     .tabuleiro {
         grid-template-columns: var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno);
+
         grid-template-rows: var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno) var(--tam-extra-pequeno);
+    }
+}
+
+@media (max-width: 320px) {
+    .tabuleiro {
+        grid-template-columns: var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno);
+
+        grid-template-rows: var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno);
     }
 }
