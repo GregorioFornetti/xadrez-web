@@ -1,24 +1,53 @@
 
+:root {
+    --tam-pequeno : 50px;
+    --tam-medio : 75px;
+    --tam-grande : 100px;
+}
+
 body {
     background-color: rgb(240, 240, 240);
 }
 
 .tabuleiro {
     display: grid;
-    grid-template-columns: auto auto auto auto auto auto auto auto;
-    grid-template-rows: auto auto auto auto auto auto auto auto;
-    width: 100%;
-    max-width: 700px;
 }
 
 .posicao-preta {
     width: 100%;
-    padding-top: 100%;
+    height: 100%;
     background-color: black;
 }
 
 .posicao-branca {
     width: 100%;
-    padding-top: 100%;
+    height: 100%;
     background-color: rgb(212, 193, 193);
+}
+
+.responsive-img {
+    width: 100%;
+    height: auto;
+}
+
+
+@media (min-width: 701px) {
+    .tabuleiro {
+        grid-template-columns: var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande);
+        grid-template-rows: var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande);
+    }
+}
+
+@media (min-width: 401px) and (max-width: 700px) {
+    .tabuleiro {
+        grid-template-columns: var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio);
+        grid-template-rows: var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio) var(--tam-medio);
+    }
+}
+
+@media (max-width: 400px) {
+    .tabuleiro {
+        grid-template-columns: var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno);
+        grid-template-rows: var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno) var(--tam-pequeno);
+    }
 }
