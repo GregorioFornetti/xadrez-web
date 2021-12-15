@@ -1,12 +1,18 @@
+const STRING_PEAO = "peao"
+const STRING_CAVALO = "cavalo"
+const STRING_BISPO = "bispo"
+const STRING_TORRE = "torre"
+const STRING_DAMA = "dama"
+const STRING_REI = "rei"
 
 function inicializar_peca(nomePeca, corPeca) {
     let peca = document.createElement('img')
     if (corPeca == COR_BRANCA) {
-        peca.src = `sprites/${nomePeca}-branco.png`
-        peca.className = `${nomePeca}-branco responsive-img`
+        peca.src = `sprites/${nomePeca}-${cor_para_string(COR_BRANCA)}.png`
+        peca.className = `${nomePeca}-${cor_para_string(COR_BRANCA)} responsive-img`
     } else {
-        peca.src = `sprites/${nomePeca}-preto.png`
-        peca.className = `${nomePeca}-preto responsive-img`
+        peca.src = `sprites/${nomePeca}-${cor_para_string(COR_PRETA)}.png`
+        peca.className = `${nomePeca}-${cor_para_string(COR_PRETA)} responsive-img`
     }
     return peca
 }
@@ -32,10 +38,41 @@ function calcular_deslocamento_horizontal(coluna_origem, coluna_destino) {
     return Math.abs(coluna_para_inteiro(coluna_origem.toUpperCase()) - coluna_para_inteiro(coluna_destino.toUpperCase()))
 }
 
+function coletar_cor_peca(peca) {
+    if (peca.className.indexOf(cor_para_string(COR_PRETA)) != -1)
+        return COR_PRETA
+    else if (peca.className.indexOf(cor_para_string(COR_BRANCA)) != -1)
+        return COR_BRANCA
+    throw new Error("Peça inválida, não possui um classe indicando sua cor")
+}
+
+function eh_peao(peca) {
+    return peca.className.indexOf(STRING_PEAO) != -1
+}
+
+function eh_cavalo(peca) {
+    return peca.className.indexOf(STRING_CAVALO) != -1
+}
+
+function eh_bispo(peca) {
+    return peca.className.indexOf(STRING_BISPO) != -1
+}
+
+function eh_torre(peca) {
+    return peca.className.indexOf(STRING_TORRE) != -1
+}
+
+function eh_dama(peca) {
+    return peca.className.indexOf(STRING_DAMA) != -1
+}
+
+function eh_rei(peca) {
+    return peca.className.indexOf(STRING_REI) != -1
+}
 
 function criar_peao(cor) {
-    let peao = inicializar_peca("peao", cor)
-    peao.checaMovimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
+    let peao = inicializar_peca(STRING_PEAO, cor)
+    peao.checa_movimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
         if (linha_origem == linha_destino && coluna_origem == coluna_destino)
             return false
         
@@ -49,8 +86,8 @@ function criar_peao(cor) {
 }
 
 function criar_cavalo(cor) {
-    let cavalo = inicializar_peca("cavalo", cor)
-    cavalo.checaMovimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
+    let cavalo = inicializar_peca(STRING_CAVALO, cor)
+    cavalo.checa_movimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
         if (linha_origem == linha_destino && coluna_origem == coluna_destino)
             return false
         
@@ -62,8 +99,8 @@ function criar_cavalo(cor) {
 }
 
 function criar_bispo(cor) {
-    let bispo = inicializar_peca("bispo", cor)
-    bispo.checaMovimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
+    let bispo = inicializar_peca(STRING_BISPO, cor)
+    bispo.checa_movimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
         if (linha_origem == linha_destino && coluna_origem == coluna_destino)
             return false
         
@@ -73,8 +110,8 @@ function criar_bispo(cor) {
 }
 
 function criar_torre(cor) {
-    let torre = inicializar_peca("torre", cor)
-    torre.checaMovimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
+    let torre = inicializar_peca(STRING_TORRE, cor)
+    torre.checa_movimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
         if (linha_origem == linha_destino && coluna_origem == coluna_destino)
             return false
         
@@ -85,8 +122,8 @@ function criar_torre(cor) {
 
 function criar_dama(cor) {
     
-    let dama = inicializar_peca("dama", cor)
-    dama.checaMovimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
+    let dama = inicializar_peca(STRING_DAMA, cor)
+    dama.checa_movimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
         if (linha_origem == linha_destino && coluna_origem == coluna_destino)
             return false
         
@@ -96,8 +133,8 @@ function criar_dama(cor) {
 }
 
 function criar_rei(cor) {
-    let rei = inicializar_peca("rei", cor)
-    rei.checaMovimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
+    let rei = inicializar_peca(STRING_REI, cor)
+    rei.checa_movimento = (linha_origem, coluna_origem, linha_destino, coluna_destino) => {
         if (linha_origem == linha_destino && coluna_origem == coluna_destino)
             return false
         

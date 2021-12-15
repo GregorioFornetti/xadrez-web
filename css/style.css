@@ -1,10 +1,11 @@
 
 :root {
-    --tam-extra-extra-pequeno : 32px;
-    --tam-extra-pequeno : 40px;
+    --tam-extra-extra-pequeno : 24px;
+    --tam-extra-pequeno : 32px;
     --tam-pequeno : 48px;
     --tam-medio : 64px;
-    --tam-grande : 96px;
+    --tam-grande : 80px;
+    --tam-padding-posicoes : px;
 }
 
 body {
@@ -13,25 +14,40 @@ body {
 
 .tabuleiro {
     display: grid;
+    gap: calc(var(--tam-padding-posicoes) * 2);
     width: fit-content;
     margin: auto;
 }
 
-.posicao-preta {
+.posicao {
     width: 100%;
     height: 100%;
-    background-color: black;
+    padding: var(--tam-padding-posicoes);
+}
+
+.posicao-preta {
+    background-color: rgb(80, 80, 80);
 }
 
 .posicao-branca {
-    width: 100%;
-    height: 100%;
     background-color: rgb(212, 193, 193);
 }
 
 .responsive-img {
     width: 100%;
     height: auto;
+}
+
+.responsive-img::selection {
+    background-color:transparent;
+}
+
+.posicao-inicial {
+    background-color: rgb(189, 173, 28);
+}
+
+.posicao-alcancavel {
+    border: 5px solid blue;
 }
 
 
