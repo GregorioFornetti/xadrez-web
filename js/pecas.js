@@ -7,6 +7,7 @@ const STRING_REI = "rei"
 
 function inicializar_peca(nomePeca, corPeca) {
     let peca = document.createElement('img')
+    peca.cor = corPeca
     if (corPeca == COR_BRANCA) {
         peca.src = `sprites/${nomePeca}-${cor_para_string(COR_BRANCA)}.png`
         peca.className = `${nomePeca}-${cor_para_string(COR_BRANCA)} responsive-img`
@@ -36,14 +37,6 @@ function calcular_deslocamento_vertical(linha_origem, linha_destino) {
 */
 function calcular_deslocamento_horizontal(coluna_origem, coluna_destino) {
     return Math.abs(coluna_para_inteiro(coluna_origem.toUpperCase()) - coluna_para_inteiro(coluna_destino.toUpperCase()))
-}
-
-function coletar_cor_peca(peca) {
-    if (peca.className.indexOf(cor_para_string(COR_PRETA)) != -1)
-        return COR_PRETA
-    else if (peca.className.indexOf(cor_para_string(COR_BRANCA)) != -1)
-        return COR_BRANCA
-    throw new Error("Peça inválida, não possui um classe indicando sua cor")
 }
 
 function eh_peao(peca) {

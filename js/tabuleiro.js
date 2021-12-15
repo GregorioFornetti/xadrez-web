@@ -1,4 +1,8 @@
 
+const tabuleiro_jogada_realizada = new CustomEvent("jogadarealizada")
+const CLASSE_MARCACAO_POSIC_INICIAL = "posicao-inicial"
+const CLASSE_MARCACAO_POSIC_ALCANCAVEL = "posicao-alcancavel"
+
 function verifica_linha_valida(linha) {
     if (linha < 1 || linha > 8)
         throw Error("Linha inválida, deve ser um número entre 1 e 8")
@@ -13,6 +17,9 @@ function verifica_coluna_valida(coluna) {
 function criar_tabuleiro() {
     let tabuleiro = document.createElement("div")
     tabuleiro.className = "tabuleiro"
+    tabuleiro.cor_jogador_atual = COR_BRANCA
+    tabuleiro.qnt_jogadas = 0
+    tabuleiro.posicao_inicial = null
 
     for (let linha = 8; linha >= 1; linha--) {
         for (let coluna = 0; coluna < 8; coluna++) {
@@ -20,14 +27,36 @@ function criar_tabuleiro() {
             let posicao_atual = document.createElement("div")
 
             posicao_atual.id = char_coluna + linha
+            posicao_atual.linha = linha
+            posicao_atual.coluna = char_coluna
+
             if ((linha + coluna) % 2 == 0)
                 posicao_atual.className = "posicao posicao-preta"
             else
                 posicao_atual.className = "posicao posicao-branca"
             
+            
             posicao_atual.addEventListener("click", () => {
-                posicao_atual.className += ' posicao-inicial'
-                console.log(posicao_atual.className)
+                if (eh_posicao_inicial_valida(posicao_atual, tabuleiro)) {
+                    if (posicao_atual == tabuleiro.posicao_inicial) {
+                        desmarcar_todas_posicoes(tabuleiro)
+                        tabuleiro.posicao_inicial = null
+                    } else if (tabuleiro.posicao_inicial != null) {
+                        desmarcar_todas_posicoes(tabuleiro)
+                        tabuleiro.posicao_inicial = posicao_atual
+                        marcar_posicao_inicial(posicao_atual)
+                        marcar_posicoes_alcancaveis(posicao_atual, tabuleiro)
+                    } else {
+                        tabuleiro.posicao_inicial = posicao_atual
+                        marcar_posicao_inicial(posicao_atual)
+                        marcar_posicoes_alcancaveis(posicao_atual, tabuleiro)
+                    }
+                }
+                /*
+                console.log("" + tabuleiro.cor_jogador_atual + tabuleiro.qnt_jogadas)
+                tabuleiro.cor_jogador_atual = coletar_cor_oponente(tabuleiro.cor_jogador_atual)
+                tabuleiro.qnt_jogadas++
+                */
             })
             tabuleiro.appendChild(posicao_atual)
         }
@@ -86,54 +115,54 @@ function eh_caminho_livre(linha_origem, coluna_origem, linha_destino, coluna_des
     if ((linha_origem == linha_destino) && (coluna_origem_int < coluna_destino_int)) {	//Direita Reto
         for (let j = coluna_origem_int + 1; j < coluna_destino_int; j++ ) {
             let coluna_atual = String.fromCharCode('A'.charCodeAt(0) + j)
-            if (eh_posicao_livre(linha_origem, coluna_atual, tabuleiro)) {
+            if (!eh_posicao_livre(linha_origem, coluna_atual, tabuleiro)) {
                 return false;
             }
         }	
     } else if ((linha_origem == linha_destino) && (coluna_origem_int > coluna_destino_int)) {	//Esquerda Reto
         for (let j = coluna_origem_int - 1; j > coluna_destino_int; j-- ) {
             let coluna_atual = String.fromCharCode('A'.charCodeAt(0) + j)
-            if (eh_posicao_livre(linha_origem, coluna_atual, tabuleiro)) {
+            if (!eh_posicao_livre(linha_origem, coluna_atual, tabuleiro)) {
                 return false;
             }
         }	
     } else if ((linha_origem < linha_destino) && (coluna_origem_int == coluna_destino_int)) {	//Cima Reto
         for (let linha_atual = linha_origem + 1; linha_atual < linha_destino; linha_atual++ ) {
-            if (eh_posicao_livre(linha_atual, coluna_origem, tabuleiro)) {
+            if (!eh_posicao_livre(linha_atual, coluna_origem, tabuleiro)) {
                 return false;
             }
         }	
     } else if ((linha_origem > linha_destino) && (coluna_origem_int == coluna_destino_int)) {	//Baixo Reto
         for (let linha_atual = linha_origem - 1; linha_atual > linha_destino; linha_atual-- ) {
-            if (eh_posicao_livre(linha_atual, coluna_origem, tabuleiro)) {
+            if (!eh_posicao_livre(linha_atual, coluna_origem, tabuleiro)) {
                 return false;
             }
         }	
     } else if ((coluna_destino_int > coluna_origem_int) && (-(linha_destino - linha_origem) == (coluna_destino_int - coluna_origem_int))) {	//Direita Baixo
         for (let k = 1; k < coluna_destino_int - coluna_origem_int; k++ ) {
-            let coluna_atual = String.fromCharCode('A'.charCodeAt(0) + k)
-            if (eh_posicao_livre(linha_origem - k, coluna_atual, tabuleiro)) {
+            let coluna_atual = String.fromCharCode(coluna_origem.charCodeAt(0) + k)
+            if (!eh_posicao_livre(linha_origem - k, coluna_atual, tabuleiro)) {
                 return false;
             }
         }	
     } else if ((coluna_destino_int > coluna_origem_int) && ((linha_destino - linha_origem) == (coluna_destino_int - coluna_origem_int))) {	//Direita Cima
         for (let k = 1; k < coluna_destino_int - coluna_origem_int; k++ ) {
-            let coluna_atual = String.fromCharCode('A'.charCodeAt(0) + k)
-            if (eh_posicao_livre(linha_origem + k, coluna_atual, tabuleiro)) {
+            let coluna_atual = String.fromCharCode(coluna_origem.charCodeAt(0) + k)
+            if (!eh_posicao_livre(linha_origem + k, coluna_atual, tabuleiro)) {
                 return false;
             }
         }	
     } else if ((coluna_destino_int < coluna_origem_int) && ((linha_destino - linha_origem) == (coluna_destino_int - coluna_origem_int))) {	//Esquerda Baixo
         for (let k = 1; k < coluna_origem_int - coluna_destino_int; k++ ) {
-            let coluna_atual = String.fromCharCode('A'.charCodeAt(0) - k)
-            if (eh_posicao_livre(linha_origem - k, coluna_atual, tabuleiro)) {
+            let coluna_atual = String.fromCharCode(coluna_origem.charCodeAt(0) - k)
+            if (!eh_posicao_livre(linha_origem - k, coluna_atual, tabuleiro)) {
                 return false;
             }
         }	
     } else if ((coluna_destino_int < coluna_origem_int) && (-(linha_destino - linha_origem) == (coluna_destino_int - coluna_origem_int))){	//Esquerda Cima
         for (let k = 1; k < coluna_origem_int - coluna_destino_int; k++ ) {
-            let coluna_atual = String.fromCharCode('A'.charCodeAt(0) - k)
-            if (eh_posicao_livre(linha_origem + k, coluna_atual, tabuleiro)) {
+            let coluna_atual = String.fromCharCode(coluna_origem.charCodeAt(0) - k)
+            if (!eh_posicao_livre(linha_origem + k, coluna_atual, tabuleiro)) {
                 return false;
             }
         }	
@@ -145,7 +174,7 @@ function eh_caminho_livre(linha_origem, coluna_origem, linha_destino, coluna_des
 function eh_pecas_cores_diferentes(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {  
     // Verifica se a peça da origem é de cor diferente da de destino
     // OBS: nas duas posições precisam possuir peças, caso contrário ocorrerá um erro
-    return coletar_cor_peca(coletar_peca(linha_origem, coluna_origem, tabuleiro)) != coletar_cor_peca(coletar_peca(linha_destino, coluna_destino, tabuleiro))
+    return coletar_peca(linha_origem, coluna_origem, tabuleiro).cor != coletar_peca(linha_destino, coluna_destino, tabuleiro).cor
 }
 
 function eh_movimento_peao_para_diagonal(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
@@ -156,19 +185,19 @@ function eh_movimento_peao_para_diagonal(linha_origem, coluna_origem, linha_dest
 	
 }
 
-function eh_movimento_peao_para_frente(linha_origem, coluna_origem, linha_destino, coluna_destino) {
+function eh_movimento_peao_para_frente(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
     // Verifica se o peao pode ir para frente (não pode comer para frente)
     return eh_peao(coletar_peca(linha_origem, coluna_origem, tabuleiro)) && calcular_deslocamento_horizontal(coluna_origem, coluna_destino) == 0
 }
 
-function checaMovimento(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
+function checa_movimento(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
     // Verifica se o movimento é válido da posição origem até a posição de destino.
     // OBS: não é verificado movimentos especiais nesse método
     if (eh_posicao_livre(linha_origem, coluna_origem, tabuleiro)) {
         return false;
     }
     
-    if (coletar_peca(linha_origem, coluna_origem, tabuleiro).checa_movimento(linha_origem, coluna_origem, linha_destino, coluna_destino)) {
+    if (!coletar_peca(linha_origem, coluna_origem, tabuleiro).checa_movimento(linha_origem, coluna_origem, linha_destino, coluna_destino)) {
         return false;
     }
     
@@ -184,7 +213,7 @@ function checaMovimento(linha_origem, coluna_origem, linha_destino, coluna_desti
     }
     
     if(eh_pecas_cores_diferentes(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)) {
-        if (checaMovimentoPeaoFrente(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)) {
+        if (eh_movimento_peao_para_frente(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)) {
             return false;
         }
         return true;
@@ -192,4 +221,38 @@ function checaMovimento(linha_origem, coluna_origem, linha_destino, coluna_desti
         return false;
     }
     
+}
+
+function marcar_posicao_inicial(posicao) {
+    posicao.className += ` ${CLASSE_MARCACAO_POSIC_INICIAL}`
+}
+
+function marcar_posicao_alcancavel(posicao) {
+    posicao.className += ` ${CLASSE_MARCACAO_POSIC_ALCANCAVEL}`
+}
+
+function marcar_posicoes_alcancaveis(posicao_inicial, tabuleiro) {
+    for (let posicao_final of tabuleiro.children) {
+        if (checa_movimento(posicao_inicial.linha, posicao_inicial.coluna, posicao_final.linha, posicao_final.coluna, tabuleiro)) {
+            marcar_posicao_alcancavel(posicao_final)
+        }
+    }
+}
+
+function eh_posicao_inicial_valida(posicao, tabuleiro) {
+    if (!eh_posicao_livre(posicao.linha, posicao.coluna, tabuleiro)) {
+        return coletar_peca(posicao.linha, posicao.coluna, tabuleiro).cor == tabuleiro.cor_jogador_atual
+    }
+    return false
+}
+
+function desmarcar_posicao(posicao) {
+    let re = new RegExp(`${CLASSE_MARCACAO_POSIC_ALCANCAVEL}|${CLASSE_MARCACAO_POSIC_INICIAL}`)
+    posicao.className = posicao.className.replace(re, "")
+}
+
+function desmarcar_todas_posicoes(tabuleiro) {
+    for (let posicao of tabuleiro.children) {
+        desmarcar_posicao(posicao)
+    }
 }
