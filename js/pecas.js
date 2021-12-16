@@ -8,6 +8,7 @@ const STRING_REI = "rei"
 function inicializar_peca(nomePeca, corPeca) {
     let peca = document.createElement('img')
     peca.cor = corPeca
+    peca.draggable = false
     if (corPeca == COR_BRANCA) {
         peca.src = `sprites/${nomePeca}-${cor_para_string(COR_BRANCA)}.png`
         peca.className = `${nomePeca}-${cor_para_string(COR_BRANCA)} responsive-img`

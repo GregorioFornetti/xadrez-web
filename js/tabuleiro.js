@@ -3,14 +3,16 @@ const tabuleiro_jogada_realizada = new CustomEvent("jogadarealizada")
 const CLASSE_MARCACAO_POSIC_INICIAL = "posicao-inicial"
 const CLASSE_MARCACAO_POSIC_ALCANCAVEL = "posicao-alcancavel"
 
-function verifica_linha_valida(linha) {
+function eh_linha_valida(linha) {
     if (linha < 1 || linha > 8)
         throw Error("Linha inválida, deve ser um número entre 1 e 8")
+    return true
 }
 
-function verifica_coluna_valida(coluna) {
+function eh_coluna_valida(coluna) {
     if (coluna.length != 1 || !(coluna.charCodeAt(0) >= 'A'.charCodeAt(0) && coluna.charCodeAt(0) <= 'H'.charCodeAt(0)))
         throw Error("Coluna inválida, deve ser um caractere de A a H")
+    return true
 }
 
 
@@ -51,16 +53,14 @@ function criar_tabuleiro() {
                         marcar_posicao_inicial(posicao_atual)
                         marcar_posicoes_alcancaveis(posicao_atual, tabuleiro)
                     }
+                } else if (tabuleiro.posicao_inicial != null) {
+                    realiza_movimento(tabuleiro.posicao_inicial.linha, tabuleiro.posicao_inicial.coluna, posicao_atual.linha, posicao_atual.coluna, tabuleiro)
                 }
-                /*
-                console.log("" + tabuleiro.cor_jogador_atual + tabuleiro.qnt_jogadas)
-                tabuleiro.cor_jogador_atual = coletar_cor_oponente(tabuleiro.cor_jogador_atual)
-                tabuleiro.qnt_jogadas++
-                */
             })
             tabuleiro.appendChild(posicao_atual)
         }
     }
+    
     colocar_pecas_no_tabuleiro(tabuleiro)
     return tabuleiro
 }
@@ -99,7 +99,10 @@ function eh_posicao_livre(linha, coluna, tabuleiro) {
 function coletar_peca(linha, coluna, tabuleiro) {
     // Coleta a peça disponível em uma posição do tabuleiro
     // OBS: se for usado com uma posição vazia, ocorrerá um erro
-    return tabuleiro.querySelector(`#${coluna}${linha}`).children[0]
+    let posicao = tabuleiro.querySelector(`#${coluna}${linha}`)
+    if (posicao.childElementCount == 1)
+        return posicao.children[0]
+    return null
 }
 
 function eh_posicao_livre(linha, coluna, tabuleiro) {  
@@ -113,15 +116,15 @@ function eh_caminho_livre(linha_origem, coluna_origem, linha_destino, coluna_des
     let coluna_destino_int = coluna_para_inteiro(coluna_destino)
     
     if ((linha_origem == linha_destino) && (coluna_origem_int < coluna_destino_int)) {	//Direita Reto
-        for (let j = coluna_origem_int + 1; j < coluna_destino_int; j++ ) {
-            let coluna_atual = String.fromCharCode('A'.charCodeAt(0) + j)
+        for (let k = 1; k < coluna_destino_int - coluna_origem_int; k++ ) {
+            let coluna_atual = String.fromCharCode(coluna_origem.charCodeAt(0) + k)
             if (!eh_posicao_livre(linha_origem, coluna_atual, tabuleiro)) {
                 return false;
             }
         }	
     } else if ((linha_origem == linha_destino) && (coluna_origem_int > coluna_destino_int)) {	//Esquerda Reto
-        for (let j = coluna_origem_int - 1; j > coluna_destino_int; j-- ) {
-            let coluna_atual = String.fromCharCode('A'.charCodeAt(0) + j)
+        for (let k = 1; k < coluna_origem_int - coluna_destino_int; k++ ) {
+            let coluna_atual = String.fromCharCode(coluna_origem.charCodeAt(0) - k)
             if (!eh_posicao_livre(linha_origem, coluna_atual, tabuleiro)) {
                 return false;
             }
@@ -255,4 +258,112 @@ function desmarcar_todas_posicoes(tabuleiro) {
     for (let posicao of tabuleiro.children) {
         desmarcar_posicao(posicao)
     }
+}
+
+function eh_posicao_controlada(linha, coluna, cor_jogador, tabuleiro) {
+    // Verifica se a posição passada eh controlada pelo adversário
+
+    for (let posicao of tabuleiro.children) {
+        if (!eh_posicao_livre(posicao.linha, posicao.coluna, tabuleiro) &&
+            coletar_peca(posicao.linha, posicao.coluna, tabuleiro).cor != cor_jogador &&
+            checa_movimento(posicao.linha, posicao.coluna, linha, coluna, tabuleiro)) {
+            
+            return true;
+        }
+    }
+    return false;
+}
+
+function eh_xeque(tabuleiro, cor_jogador) {
+    // Verifica se o jogador com a cor passada como parâmetro está em xeque.
+    for (let posicao of tabuleiro.children) {
+        if (!eh_posicao_livre(posicao.linha, posicao.coluna, tabuleiro) &&
+        eh_rei(coletar_peca(posicao.linha, posicao.coluna, tabuleiro)) &&
+        cor_jogador == coletar_peca(posicao.linha, posicao.coluna, tabuleiro).cor) {
+            return eh_posicao_controlada(posicao.linha, posicao.coluna, cor_jogador, tabuleiro);
+        }
+    }
+    return false
+}
+
+
+function mover_peca(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
+    let peca = coletar_peca(linha_origem, coluna_origem, tabuleiro)
+    let posicao_origem = tabuleiro.querySelector(`#${coluna_origem}${linha_origem}`)
+    let posicao_destino = tabuleiro.querySelector(`#${coluna_destino}${linha_destino}`)
+    
+    posicao_origem.innerHTML = ''
+    posicao_destino.innerHTML = ''
+    posicao_destino.appendChild(peca)
+}
+
+function volta_movimento(linha_origem, coluna_origem, linha_destino, coluna_destino, peca_origem, peca_destino, tabuleiro) {
+    let posicao_origem = tabuleiro.querySelector(`#${coluna_origem}${linha_origem}`)
+    let posicao_destino = tabuleiro.querySelector(`#${coluna_destino}${linha_destino}`)
+
+    posicao_origem.innerHTML = ''
+    posicao_destino.innerHTML = ''
+
+    posicao_origem.appendChild(peca_origem)
+    if (peca_destino != null) {
+        posicao_destino.appendChild(peca_destino)
+    }
+}
+
+function impede_xeque(linha, coluna, cor_jogador, tabuleiro) {
+    let peca_origem = coletar_peca(linha, coluna, tabuleiro)
+    for (let posicao_final of tabuleiro.children) {
+        if (checa_movimento(linha, coluna, posicao_final.linha, posicao_final.coluna, tabuleiro)) {
+            let peca_destino = coletar_peca(posicao_final.linha, posicao_final.coluna, tabuleiro)
+            mover_peca(linha, coluna, posicao_final.linha, posicao_final.coluna, tabuleiro)
+            if (!eh_xeque(tabuleiro, cor_jogador)) {
+                volta_movimento(linha, coluna, posicao_final.linha, posicao_final.coluna, peca_origem, peca_destino, tabuleiro)
+                return true
+            }
+            volta_movimento(linha, coluna, posicao_final.linha, posicao_final.coluna, peca_origem, peca_destino, tabuleiro)
+        }
+    }
+}
+
+function eh_xeque_mate(tabuleiro, cor_jogador) {
+    if (eh_xeque(tabuleiro, cor_jogador)) {
+        for (let posicao of tabuleiro.children) {
+            if (!eh_posicao_livre(posicao.linha, posicao.coluna, tabuleiro) && coletar_peca(posicao.linha, posicao.coluna, tabuleiro).cor == cor_jogador && impede_xeque(posicao.linha, posicao.coluna, cor_jogador, tabuleiro)) {
+                return false
+            }
+        }
+        return true
+    }
+    return false
+}
+
+function finalizar_jogada(tabuleiro) {
+    tabuleiro.cor_jogador_atual = coletar_cor_oponente(tabuleiro.cor_jogador_atual)
+    tabuleiro.qnt_jogadas++
+    tabuleiro.posicao_inicial = null
+    desmarcar_todas_posicoes(tabuleiro)
+}
+
+function realiza_movimento(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
+
+    if (!eh_linha_valida(linha_origem) || !eh_coluna_valida(coluna_origem) || !eh_linha_valida(linha_destino) || !eh_coluna_valida(coluna_destino))
+        return false
+    
+    if (eh_posicao_livre(linha_origem, coluna_origem, tabuleiro) || coletar_peca(linha_origem, coluna_origem, tabuleiro).cor != tabuleiro.cor_jogador_atual)
+        return false
+
+    if (!checa_movimento(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro))
+        return false
+    
+    let peca_origem = coletar_peca(linha_origem, coluna_origem, tabuleiro)
+    let peca_destino = coletar_peca(linha_destino, coluna_destino, tabuleiro)
+
+    mover_peca(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)
+    if (eh_xeque(tabuleiro, tabuleiro.cor_jogador_atual)) {
+        volta_movimento(linha_origem, coluna_origem, linha_destino, coluna_destino, peca_origem, peca_destino, tabuleiro)
+        return false
+    }
+
+    finalizar_jogada(tabuleiro)
+    return true
 }
