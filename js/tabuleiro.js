@@ -364,6 +364,56 @@ function realiza_movimento(linha_origem, coluna_origem, linha_destino, coluna_de
         return false
     }
 
+    if (verifica_promocao(linha_destino, coluna_destino, tabuleiro))
+        criar_tela_de_promocao(document.querySelector(`#${coluna_destino}${linha_destino}`), tabuleiro.cor_jogador_atual)
+
     finalizar_jogada(tabuleiro)
     return true
+}
+
+
+function verifica_promocao(linha_destino, coluna_destino, tabuleiro) {
+    // Usar essa função apenas após realizar o movimento em si.
+    return (linha_destino == 1 || linha_destino == 8) && eh_peao(coletar_peca(linha_destino, coluna_destino, tabuleiro))
+}
+
+function criar_btn_promocao(posicao_peao_promovido, modal, texto_btn, cor_peao, criar_peca) {
+    let btn_promocao = document.createElement('button')
+    btn_promocao.innerText = texto_btn
+    btn_promocao.className = "btn-promocao"
+    btn_promocao.addEventListener('click', () => {
+        let peca_promocao = criar_peca(cor_peao)
+        posicao_peao_promovido.innerHTML = ''
+        posicao_peao_promovido.appendChild(peca_promocao)
+        modal.remove()
+    })
+    return btn_promocao
+}
+
+function criar_tela_de_promocao(posicao_peao_promovido, cor_peao) {
+    let modal = document.createElement('div')
+    modal.className = 'modal'
+
+    let container_btns = document.createElement('div')
+    container_btns.className = 'container-promocao'
+    modal.appendChild(container_btns)
+
+    let titulo_promocao = document.createElement('h2')
+    titulo_promocao.innerText = 'Escolha uma peça para promover o seu peão'
+    titulo_promocao.style.textAlign = 'center'
+    container_btns.appendChild(titulo_promocao)
+
+    let btn_cavalo = criar_btn_promocao(posicao_peao_promovido, modal, STRING_CAVALO, cor_peao, criar_cavalo)
+    container_btns.appendChild(btn_cavalo)
+
+    let btn_bispo = criar_btn_promocao(posicao_peao_promovido, modal, STRING_BISPO, cor_peao, criar_bispo)
+    container_btns.appendChild(btn_bispo)
+
+    let btn_torre = criar_btn_promocao(posicao_peao_promovido, modal, STRING_TORRE, cor_peao, criar_torre)
+    container_btns.appendChild(btn_torre)
+
+    let btn_dama = criar_btn_promocao(posicao_peao_promovido, modal, STRING_DAMA, cor_peao, criar_dama)
+    container_btns.appendChild(btn_dama)
+
+    document.body.appendChild(modal)
 }
