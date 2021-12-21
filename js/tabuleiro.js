@@ -22,6 +22,8 @@ function criar_tabuleiro() {
     tabuleiro.cor_jogador_atual = COR_BRANCA
     tabuleiro.qnt_jogadas = 0
     tabuleiro.posicao_inicial = null
+    tabuleiro.em_xeque = false
+    tabuleiro.posicao_peao_que_movimentou_duas_para_frente = null
 
     for (let linha = 8; linha >= 1; linha--) {
         for (let coluna = 0; coluna < 8; coluna++) {
@@ -65,41 +67,45 @@ function criar_tabuleiro() {
     return tabuleiro
 }
 
-function colocar_pecas_no_tabuleiro(tabuleiro) {
-    for (let coluna = 0; coluna < 8; coluna++) {
-        let char_coluna = String.fromCharCode('A'.charCodeAt(0) + coluna)
-        tabuleiro.querySelector(`#${char_coluna}7`).appendChild(criar_peao(COR_PRETA))
-        tabuleiro.querySelector(`#${char_coluna}2`).appendChild(criar_peao(COR_BRANCA))
-    }
-
-    tabuleiro.querySelector("#A8").appendChild(criar_torre(COR_PRETA))
-    tabuleiro.querySelector("#B8").appendChild(criar_cavalo(COR_PRETA))
-    tabuleiro.querySelector("#C8").appendChild(criar_bispo(COR_PRETA))
-    tabuleiro.querySelector("#D8").appendChild(criar_dama(COR_PRETA))
-    tabuleiro.querySelector("#E8").appendChild(criar_rei(COR_PRETA))
-    tabuleiro.querySelector("#F8").appendChild(criar_bispo(COR_PRETA))
-    tabuleiro.querySelector("#G8").appendChild(criar_cavalo(COR_PRETA))
-    tabuleiro.querySelector("#H8").appendChild(criar_torre(COR_PRETA))
-
-    tabuleiro.querySelector("#A1").appendChild(criar_torre(COR_BRANCA))
-    tabuleiro.querySelector("#B1").appendChild(criar_cavalo(COR_BRANCA))
-    tabuleiro.querySelector("#C1").appendChild(criar_bispo(COR_BRANCA))
-    tabuleiro.querySelector("#D1").appendChild(criar_dama(COR_BRANCA))
-    tabuleiro.querySelector("#E1").appendChild(criar_rei(COR_BRANCA))
-    tabuleiro.querySelector("#F1").appendChild(criar_bispo(COR_BRANCA))
-    tabuleiro.querySelector("#G1").appendChild(criar_cavalo(COR_BRANCA))
-    tabuleiro.querySelector("#H1").appendChild(criar_torre(COR_BRANCA))
+function coletar_posicao(linha, coluna, tabuleiro) {
+    return tabuleiro.querySelector(`#${coluna}${linha}`)
 }
 
 function eh_posicao_livre(linha, coluna, tabuleiro) {  
     // Verifica se a posição não possui peça (a div de posição não pode ter nada, no caso a peça de img)
-    return tabuleiro.querySelector(`#${coluna}${linha}`).childElementCount == 0
+    return coletar_posicao(linha, coluna, tabuleiro).childElementCount == 0
+}
+
+function colocar_pecas_no_tabuleiro(tabuleiro) {
+    for (let coluna = 0; coluna < 8; coluna++) {
+        let char_coluna = String.fromCharCode('A'.charCodeAt(0) + coluna)
+        coletar_posicao(7, char_coluna, tabuleiro).appendChild(criar_peao(COR_PRETA))
+        coletar_posicao(2, char_coluna, tabuleiro).appendChild(criar_peao(COR_BRANCA))
+    }
+
+    coletar_posicao(8, "A", tabuleiro).appendChild(criar_torre(COR_PRETA))
+    coletar_posicao(8, "B", tabuleiro).appendChild(criar_cavalo(COR_PRETA))
+    coletar_posicao(8, "C", tabuleiro).appendChild(criar_bispo(COR_PRETA))
+    coletar_posicao(8, "D", tabuleiro).appendChild(criar_dama(COR_PRETA))
+    coletar_posicao(8, "E", tabuleiro).appendChild(criar_rei(COR_PRETA))
+    coletar_posicao(8, "F", tabuleiro).appendChild(criar_bispo(COR_PRETA))
+    coletar_posicao(8, "G", tabuleiro).appendChild(criar_cavalo(COR_PRETA))
+    coletar_posicao(8, "H", tabuleiro).appendChild(criar_torre(COR_PRETA))
+
+    coletar_posicao(1, "A", tabuleiro).appendChild(criar_torre(COR_BRANCA))
+    coletar_posicao(1, "B", tabuleiro).appendChild(criar_cavalo(COR_BRANCA))
+    coletar_posicao(1, "C", tabuleiro).appendChild(criar_bispo(COR_BRANCA))
+    coletar_posicao(1, "D", tabuleiro).appendChild(criar_dama(COR_BRANCA))
+    coletar_posicao(1, "E", tabuleiro).appendChild(criar_rei(COR_BRANCA))
+    coletar_posicao(1, "F", tabuleiro).appendChild(criar_bispo(COR_BRANCA))
+    coletar_posicao(1, "G", tabuleiro).appendChild(criar_cavalo(COR_BRANCA))
+    coletar_posicao(1, "H", tabuleiro).appendChild(criar_torre(COR_BRANCA))
 }
 
 function coletar_peca(linha, coluna, tabuleiro) {
     // Coleta a peça disponível em uma posição do tabuleiro
     // OBS: se for usado com uma posição vazia, ocorrerá um erro
-    let posicao = tabuleiro.querySelector(`#${coluna}${linha}`)
+    let posicao = coletar_posicao(linha, coluna, tabuleiro)
     if (posicao.childElementCount == 1)
         return posicao.children[0]
     return null
@@ -107,7 +113,7 @@ function coletar_peca(linha, coluna, tabuleiro) {
 
 function eh_posicao_livre(linha, coluna, tabuleiro) {  
     // Verifica se a posição não possui peça (a div de posição não pode ter nada, no caso a peça de img)
-    return tabuleiro.querySelector(`#${coluna}${linha}`).childElementCount == 0
+    return coletar_posicao(linha, coluna, tabuleiro).childElementCount == 0
 }
 
 function eh_caminho_livre(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
@@ -208,14 +214,14 @@ function checa_movimento(linha_origem, coluna_origem, linha_destino, coluna_dest
         return false;
     }
     
-    if(eh_posicao_livre(linha_destino, coluna_destino, tabuleiro)) {
+    if (eh_posicao_livre(linha_destino, coluna_destino, tabuleiro)) {
         if(eh_movimento_peao_para_diagonal(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)) {
             return false;
         }
         return true;
     }
     
-    if(eh_pecas_cores_diferentes(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)) {
+    if (eh_pecas_cores_diferentes(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)) {
         if (eh_movimento_peao_para_frente(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)) {
             return false;
         }
@@ -224,6 +230,110 @@ function checa_movimento(linha_origem, coluna_origem, linha_destino, coluna_dest
         return false;
     }
     
+}
+
+
+function verifica_roque(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
+    // Verifica se o roque pode ocorrer
+    let rei = coletar_peca(linha_origem, coluna_origem, tabuleiro)
+    if (tabuleiro.em_xeque || !eh_rei(rei) || rei.ja_movimentou)
+        return false;
+    
+    if (linha_origem == 8 && coluna_origem == 'E' && linha_destino == 8) {
+        if (coluna_destino == 'G') {
+            // Roque menor das pretas
+            return !eh_posicao_livre(8, 'H', tabuleiro) && eh_torre(coletar_peca(8, 'H', tabuleiro)) && !coletar_peca(8, 'H', tabuleiro).ja_movimentou && eh_caminho_livre(linha_origem, coluna_origem, 8, 'H', tabuleiro) && !eh_posicao_controlada(8, 'F', tabuleiro.cor_jogador_atual, tabuleiro) && !eh_posicao_controlada(8, 'G', tabuleiro.cor_jogador_atual, tabuleiro)
+        }
+        else if (coluna_destino == 'C') {
+            // Roque maior das pretas
+            return !eh_posicao_livre(8, 'A', tabuleiro) && eh_torre(coletar_peca(8, 'A', tabuleiro)) && !coletar_peca(8, 'A', tabuleiro).ja_movimentou && eh_caminho_livre(linha_origem, coluna_origem, 8, 'A', tabuleiro) && !eh_posicao_controlada(8, 'D', tabuleiro.cor_jogador_atual, tabuleiro) && !eh_posicao_controlada(8, 'C', tabuleiro.cor_jogador_atual, tabuleiro)
+        }
+    }
+    else if (linha_origem == 1 && coluna_origem == 'E' && linha_destino == 1) {
+        if (coluna_destino == 'G') {
+            // Roque menor das brancas
+            return !eh_posicao_livre(1, 'H', tabuleiro) && eh_torre(coletar_peca(1, 'H', tabuleiro)) && !coletar_peca(1, 'H', tabuleiro).ja_movimentou && eh_caminho_livre(linha_origem, coluna_origem, 1, 'H', tabuleiro) && !eh_posicao_controlada(1, 'F', tabuleiro.cor_jogador_atual, tabuleiro) && !eh_posicao_controlada(1, 'G', tabuleiro.cor_jogador_atual, tabuleiro)
+        } else if (coluna_destino == 'C') {
+            // Roque maior das  brancas
+            return !eh_posicao_livre(1, 'A', tabuleiro) && eh_torre(coletar_peca(1, 'A', tabuleiro)) && !coletar_peca(1, 'A', tabuleiro).ja_movimentou && eh_caminho_livre(linha_origem, coluna_origem, 1, 'A', tabuleiro) && !eh_posicao_controlada(1, 'D', tabuleiro.cor_jogador_atual, tabuleiro) && !eh_posicao_controlada(1, 'C', tabuleiro.cor_jogador_atual, tabuleiro)
+        }
+    }
+    return false;
+}
+
+function realiza_roque(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
+    // Realiza o roque (utilizar esse método após verificar se o roque é válido)
+    let torre
+    let rei = coletar_peca(linha_origem, coluna_origem, tabuleiro)
+    mover_peca(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)
+    rei.ja_movimentou = true
+
+    // Movimentar a torre
+    if (linha_origem == 8) {
+        if (coluna_destino == 'C') {
+            // Roque maior das pretas
+            torre = coletar_peca(8, 'A', tabuleiro)
+            mover_peca(8, 'A', 8, 'D', tabuleiro)
+        } else {
+            // Roque menor das pretas
+            torre = coletar_peca(8, 'H', tabuleiro)
+            mover_peca(8, 'H', 8, 'F', tabuleiro)
+        }
+    } else {
+        if (coluna_destino == 'C') {
+            // Roque maior das brancas
+            torre = coletar_peca(1, 'A', tabuleiro)
+            mover_peca(1, 'A', 1, 'D', tabuleiro)
+        } else {
+            // Roque menor das brancas
+            torre = coletar_peca(1, 'H', tabuleiro)
+            mover_peca(1, 'H', 1, 'F', tabuleiro)
+        }
+    }
+    torre.ja_movimentou = true
+}
+
+
+function verifica_captura_en_passant(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
+    // Verifica se a captura en passant é válida
+    let peca_origem = coletar_peca(linha_origem, coluna_origem, tabuleiro)
+    if (tabuleiro.posicao_peao_que_movimentou_duas_para_frente != null && eh_peao(peca_origem) && linha_origem == tabuleiro.posicao_peao_que_movimentou_duas_para_frente.linha && calcular_deslocamento_horizontal(coluna_origem, tabuleiro.posicao_peao_que_movimentou_duas_para_frente.coluna) == 1) {
+        // Peao que irá se movimentar está do lado do peão inimigo que se moveu duas casas. Só falta verificar se o jogador escolheu o movimento de captura en passant e se ele n causa xeque
+        let peao_que_moveu_duas_casas = coletar_peca(tabuleiro.posicao_peao_que_movimentou_duas_para_frente.linha, tabuleiro.posicao_peao_que_movimentou_duas_para_frente.coluna, tabuleiro)
+        if (coluna_destino == tabuleiro.posicao_peao_que_movimentou_duas_para_frente.coluna && ((peao_que_moveu_duas_casas.cor == COR_BRANCA && linha_destino - linha_origem == -1) || (peao_que_moveu_duas_casas.cor == COR_PRETA && linha_destino - linha_origem == 1))) {
+            // Realizar movimento e verificar se causa xeque
+            realiza_captura_en_passant(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)
+            if (eh_xeque(tabuleiro, tabuleiro.cor_jogador_atual)) {
+                volta_movimento_captura_en_passant(linha_origem, coluna_origem, linha_destino, coluna_destino, peca_origem, peao_que_moveu_duas_casas, tabuleiro)
+                return false
+            }
+            volta_movimento_captura_en_passant(linha_origem, coluna_origem, linha_destino, coluna_destino, peca_origem, peao_que_moveu_duas_casas, tabuleiro)
+            return true
+        }
+    }
+    return false
+}
+
+function volta_movimento_captura_en_passant(linha_origem, coluna_origem, linha_destino, coluna_destino, peao_ataque, peao_comido, tabuleiro) {
+    // Volta a situação inicial antes de ter sido realizado a captura en passant
+    let posicao_origem = coletar_posicao(linha_origem, coluna_origem, tabuleiro)
+    let posicao_destino = coletar_posicao(linha_destino, coluna_destino, tabuleiro)
+
+    posicao_destino.innerHTML = ''
+    posicao_origem.appendChild(peao_ataque)
+    tabuleiro.posicao_peao_que_movimentou_duas_para_frente.appendChild(peao_comido)
+}
+
+function realiza_captura_en_passant(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
+    // Realiza a captura en passant 
+    let peao_ataque = coletar_peca(linha_origem, coluna_origem, tabuleiro)
+    coletar_posicao(linha_origem, coluna_origem, tabuleiro).innerHTML = ''
+    coletar_posicao(linha_destino, coluna_destino, tabuleiro).appendChild(peao_ataque)
+    tabuleiro.posicao_peao_que_movimentou_duas_para_frente.innerHTML = ''
+}
+
+function checa_movimento_especial(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {  // Verifica se um movimento especial pode acontecer (roque e captura em passant)
+    return verifica_roque(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) || verifica_captura_en_passant(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro);
 }
 
 function marcar_posicao_inicial(posicao) {
@@ -236,7 +346,7 @@ function marcar_posicao_alcancavel(posicao) {
 
 function marcar_posicoes_alcancaveis(posicao_inicial, tabuleiro) {
     for (let posicao_final of tabuleiro.children) {
-        if (checa_movimento(posicao_inicial.linha, posicao_inicial.coluna, posicao_final.linha, posicao_final.coluna, tabuleiro)) {
+        if (checa_movimento(posicao_inicial.linha, posicao_inicial.coluna, posicao_final.linha, posicao_final.coluna, tabuleiro) || checa_movimento_especial(posicao_inicial.linha, posicao_inicial.coluna, posicao_final.linha, posicao_final.coluna, tabuleiro)) {
             marcar_posicao_alcancavel(posicao_final)
         }
     }
@@ -289,8 +399,8 @@ function eh_xeque(tabuleiro, cor_jogador) {
 
 function mover_peca(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro) {
     let peca = coletar_peca(linha_origem, coluna_origem, tabuleiro)
-    let posicao_origem = tabuleiro.querySelector(`#${coluna_origem}${linha_origem}`)
-    let posicao_destino = tabuleiro.querySelector(`#${coluna_destino}${linha_destino}`)
+    let posicao_origem = coletar_posicao(linha_origem, coluna_origem, tabuleiro)
+    let posicao_destino = coletar_posicao(linha_destino, coluna_destino, tabuleiro)
     
     posicao_origem.innerHTML = ''
     posicao_destino.innerHTML = ''
@@ -298,8 +408,8 @@ function mover_peca(linha_origem, coluna_origem, linha_destino, coluna_destino, 
 }
 
 function volta_movimento(linha_origem, coluna_origem, linha_destino, coluna_destino, peca_origem, peca_destino, tabuleiro) {
-    let posicao_origem = tabuleiro.querySelector(`#${coluna_origem}${linha_origem}`)
-    let posicao_destino = tabuleiro.querySelector(`#${coluna_destino}${linha_destino}`)
+    let posicao_origem = coletar_posicao(linha_origem, coluna_origem, tabuleiro)
+    let posicao_destino = coletar_posicao(linha_destino, coluna_destino, tabuleiro)
 
     posicao_origem.innerHTML = ''
     posicao_destino.innerHTML = ''
@@ -337,10 +447,12 @@ function eh_xeque_mate(tabuleiro, cor_jogador) {
     return false
 }
 
-function finalizar_jogada(tabuleiro) {
+function finalizar_jogada(tabuleiro, peca_movimentada) {
     tabuleiro.cor_jogador_atual = coletar_cor_oponente(tabuleiro.cor_jogador_atual)
     tabuleiro.qnt_jogadas++
     tabuleiro.posicao_inicial = null
+    peca_movimentada.ja_movimentou = true
+    tabuleiro.em_xeque = eh_xeque(tabuleiro, tabuleiro.cor_jogador_atual)
     desmarcar_todas_posicoes(tabuleiro)
 }
 
@@ -351,6 +463,19 @@ function realiza_movimento(linha_origem, coluna_origem, linha_destino, coluna_de
     
     if (eh_posicao_livre(linha_origem, coluna_origem, tabuleiro) || coletar_peca(linha_origem, coluna_origem, tabuleiro).cor != tabuleiro.cor_jogador_atual)
         return false
+    
+    if (verifica_roque(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)) {
+        
+        realiza_roque(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)
+        finalizar_jogada(tabuleiro, coletar_peca(linha_destino, coluna_destino, tabuleiro))
+        return true
+    }
+
+    if (verifica_captura_en_passant(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)) {
+        realiza_captura_en_passant(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro)
+        finalizar_jogada(tabuleiro, coletar_peca(linha_destino, coluna_destino, tabuleiro))
+        return true
+    }
 
     if (!checa_movimento(linha_origem, coluna_origem, linha_destino, coluna_destino, tabuleiro))
         return false
@@ -365,9 +490,14 @@ function realiza_movimento(linha_origem, coluna_origem, linha_destino, coluna_de
     }
 
     if (verifica_promocao(linha_destino, coluna_destino, tabuleiro))
-        criar_tela_de_promocao(document.querySelector(`#${coluna_destino}${linha_destino}`), tabuleiro.cor_jogador_atual)
+        criar_tela_de_promocao(coletar_posicao(linha_destino, coluna_destino, tabuleiro), tabuleiro.cor_jogador_atual)
 
-    finalizar_jogada(tabuleiro)
+    if (eh_peao(peca_origem) && calcular_deslocamento_vertical(linha_origem, linha_destino) == 2) {
+        tabuleiro.posicao_peao_que_movimentou_duas_para_frente = coletar_posicao(linha_destino, coluna_destino, tabuleiro)
+    } else {
+        tabuleiro.posicao_peao_que_movimentou_duas_para_frente = null
+    }
+    finalizar_jogada(tabuleiro, peca_origem)
     return true
 }
 
