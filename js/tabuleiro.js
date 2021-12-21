@@ -1,5 +1,7 @@
 
-const tabuleiro_jogada_realizada = new CustomEvent("jogadarealizada")
+const tabuleiro_movimento_realizado = new CustomEvent("mudanca")
+const tabuleiro_promocao_realizada = new CustomEvent("mudanca")
+
 const CLASSE_MARCACAO_POSIC_INICIAL = "posicao-inicial"
 const CLASSE_MARCACAO_POSIC_ALCANCAVEL = "posicao-alcancavel"
 
@@ -18,12 +20,7 @@ function eh_coluna_valida(coluna) {
 
 function criar_tabuleiro() {
     let tabuleiro = document.createElement("div")
-    tabuleiro.className = "tabuleiro"
-    tabuleiro.cor_jogador_atual = COR_BRANCA
-    tabuleiro.qnt_jogadas = 0
-    tabuleiro.posicao_inicial = null
-    tabuleiro.em_xeque = false
-    tabuleiro.posicao_peao_que_movimentou_duas_para_frente = null
+    inicializar_props_tabuleiro(tabuleiro)
 
     for (let linha = 8; linha >= 1; linha--) {
         for (let coluna = 0; coluna < 8; coluna++) {
@@ -65,6 +62,15 @@ function criar_tabuleiro() {
     
     colocar_pecas_no_tabuleiro(tabuleiro)
     return tabuleiro
+}
+
+function inicializar_props_tabuleiro(tabuleiro) {
+    tabuleiro.className = "tabuleiro"
+    tabuleiro.cor_jogador_atual = COR_BRANCA
+    tabuleiro.qnt_jogadas = 0
+    tabuleiro.posicao_inicial = null
+    tabuleiro.em_xeque = false
+    tabuleiro.posicao_peao_que_movimentou_duas_para_frente = null
 }
 
 function coletar_posicao(linha, coluna, tabuleiro) {
@@ -453,6 +459,14 @@ function finalizar_jogada(tabuleiro, peca_movimentada) {
     tabuleiro.posicao_inicial = null
     peca_movimentada.ja_movimentou = true
     tabuleiro.em_xeque = eh_xeque(tabuleiro, tabuleiro.cor_jogador_atual)
+    tabuleiro.dispatchEvent(tabuleiro_movimento_realizado)
+    if (eh_xeque_mate(tabuleiro, tabuleiro.cor_jogador_atual)) {
+        let xeque_mate_event = new CustomEvent("fimdejogo", {
+            detail: {"vencedor": coletar_cor_oponente(tabuleiro.cor_jogador_atual),
+                     "derrotado": tabuleiro.cor_jogador_atual}
+        })
+        tabuleiro.dispatchEvent(xeque_mate_event )
+    }
     desmarcar_todas_posicoes(tabuleiro)
 }
 
@@ -490,7 +504,7 @@ function realiza_movimento(linha_origem, coluna_origem, linha_destino, coluna_de
     }
 
     if (verifica_promocao(linha_destino, coluna_destino, tabuleiro))
-        criar_tela_de_promocao(coletar_posicao(linha_destino, coluna_destino, tabuleiro), tabuleiro.cor_jogador_atual)
+        criar_tela_de_promocao(coletar_posicao(linha_destino, coluna_destino, tabuleiro), tabuleiro.cor_jogador_atual, tabuleiro)
 
     if (eh_peao(peca_origem) && calcular_deslocamento_vertical(linha_origem, linha_destino) == 2) {
         tabuleiro.posicao_peao_que_movimentou_duas_para_frente = coletar_posicao(linha_destino, coluna_destino, tabuleiro)
@@ -507,7 +521,7 @@ function verifica_promocao(linha_destino, coluna_destino, tabuleiro) {
     return (linha_destino == 1 || linha_destino == 8) && eh_peao(coletar_peca(linha_destino, coluna_destino, tabuleiro))
 }
 
-function criar_btn_promocao(posicao_peao_promovido, modal, texto_btn, cor_peao, criar_peca) {
+function criar_btn_promocao(posicao_peao_promovido, modal, texto_btn, cor_peao, criar_peca, tabuleiro) {
     let btn_promocao = document.createElement('button')
     btn_promocao.innerText = texto_btn
     btn_promocao.className = "btn-promocao"
@@ -516,11 +530,12 @@ function criar_btn_promocao(posicao_peao_promovido, modal, texto_btn, cor_peao, 
         posicao_peao_promovido.innerHTML = ''
         posicao_peao_promovido.appendChild(peca_promocao)
         modal.remove()
+        tabuleiro.dispatchEvent(tabuleiro_promocao_realizada)
     })
     return btn_promocao
 }
 
-function criar_tela_de_promocao(posicao_peao_promovido, cor_peao) {
+function criar_tela_de_promocao(posicao_peao_promovido, cor_peao, tabuleiro) {
     let modal = document.createElement('div')
     modal.className = 'modal'
 
@@ -533,17 +548,29 @@ function criar_tela_de_promocao(posicao_peao_promovido, cor_peao) {
     titulo_promocao.style.textAlign = 'center'
     container_btns.appendChild(titulo_promocao)
 
-    let btn_cavalo = criar_btn_promocao(posicao_peao_promovido, modal, STRING_CAVALO, cor_peao, criar_cavalo)
+    let btn_cavalo = criar_btn_promocao(posicao_peao_promovido, modal, STRING_CAVALO, cor_peao, criar_cavalo, tabuleiro)
     container_btns.appendChild(btn_cavalo)
 
-    let btn_bispo = criar_btn_promocao(posicao_peao_promovido, modal, STRING_BISPO, cor_peao, criar_bispo)
+    let btn_bispo = criar_btn_promocao(posicao_peao_promovido, modal, STRING_BISPO, cor_peao, criar_bispo, tabuleiro)
     container_btns.appendChild(btn_bispo)
 
-    let btn_torre = criar_btn_promocao(posicao_peao_promovido, modal, STRING_TORRE, cor_peao, criar_torre)
+    let btn_torre = criar_btn_promocao(posicao_peao_promovido, modal, STRING_TORRE, cor_peao, criar_torre, tabuleiro)
     container_btns.appendChild(btn_torre)
 
-    let btn_dama = criar_btn_promocao(posicao_peao_promovido, modal, STRING_DAMA, cor_peao, criar_dama)
+    let btn_dama = criar_btn_promocao(posicao_peao_promovido, modal, STRING_DAMA, cor_peao, criar_dama, tabuleiro)
     container_btns.appendChild(btn_dama)
 
     document.body.appendChild(modal)
+}
+
+
+function remover_pecas_tabuleiro(tabuleiro) {
+    for (let posicao of tabuleiro.children)
+        posicao.innerHTML = ''
+}
+
+function reiniciar_tabuleiro(tabuleiro) {
+    inicializar_props_tabuleiro(tabuleiro)
+    remover_pecas_tabuleiro(tabuleiro)
+    colocar_pecas_no_tabuleiro(tabuleiro)
 }

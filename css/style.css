@@ -84,6 +84,44 @@ body {
     height: 50px;
 }
 
+.container-fim-de-jogo {
+    background-color: white;
+    position: absolute;
+    width: 330px;
+    height: 140px;
+    padding: 10px;
+    top: calc(50% - 70px - 5px);
+    left: calc(50% - 165px - 5px);
+    border-radius: 4px;
+}
+
+.modal-close-btn {
+    display: block;
+    float: right;
+    background-color: transparent;
+    border: 0px;
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+    opacity: 0.3;
+}
+
+.modal-close-btn:hover {
+    opacity: 1;
+}
+
+.modal-close-btn::after {
+    display: inline-block;
+    content: "\00d7"; 
+}
+
+.btn-fim-de-jogo {
+    display: block;
+    margin: 20px auto auto auto;
+    width: 150px;
+    height: 30px;
+}
+
 
 @media (min-width: 769px) {
     .tabuleiro {
