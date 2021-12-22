@@ -4,6 +4,9 @@ const tabuleiro_promocao_realizada = new CustomEvent("mudanca")
 
 const CLASSE_MARCACAO_POSIC_INICIAL = "posicao-inicial"
 const CLASSE_MARCACAO_POSIC_ALCANCAVEL = "posicao-alcancavel"
+const CLASSE_MARCACAO_POSIC_HOVER = "posicao-hover"
+const PORCENTAGEM_PADDING = 0.1  // Porcentagem decimal do padding das posições 
+var padding_atual
 
 function eh_linha_valida(linha) {
     if (linha < 1 || linha > 8)
@@ -17,8 +20,24 @@ function eh_coluna_valida(coluna) {
     return true
 }
 
+function redimensionar_tabuleiro(tabuleiro, tamanho) {
+    let tamanho_posicao = `${(tamanho / 8) * (1 - PORCENTAGEM_PADDING)}px`
+    padding_atual = `${(tamanho / 8) * (PORCENTAGEM_PADDING) / 2}px`
 
-function criar_tabuleiro() {
+    for (let posicao of tabuleiro.children) {
+        posicao.style.width = tamanho_posicao
+        posicao.style.height = tamanho_posicao
+
+        if (posicao.className.indexOf(CLASSE_MARCACAO_POSIC_ALCANCAVEL) != -1 || posicao.className.indexOf(CLASSE_MARCACAO_POSIC_HOVER) != -1) {
+            posicao.style.borderWidth = padding_atual
+        } else {
+            posicao.style.padding = padding_atual
+        }
+    }
+}
+
+
+function criar_tabuleiro(container_pai) {
     let tabuleiro = document.createElement("div")
     inicializar_props_tabuleiro(tabuleiro)
 
@@ -56,11 +75,34 @@ function criar_tabuleiro() {
                     realiza_movimento(tabuleiro.posicao_inicial.linha, tabuleiro.posicao_inicial.coluna, posicao_atual.linha, posicao_atual.coluna, tabuleiro)
                 }
             })
+
+            posicao_atual.addEventListener('mouseenter', () => {
+                if (posicao_atual.className.indexOf(CLASSE_MARCACAO_POSIC_ALCANCAVEL) != -1) {
+                    posicao_atual.style.borderColor = 'blue'
+                } else {
+                    posicao_atual.style.border = `${padding_atual} solid gray`
+                    posicao_atual.style.padding = '0px'
+                    posicao_atual.className += ` ${CLASSE_MARCACAO_POSIC_HOVER}`
+                }
+            })
+
+            posicao_atual.addEventListener('mouseleave', () => {
+                if (posicao_atual.className.indexOf(CLASSE_MARCACAO_POSIC_ALCANCAVEL) != -1) {
+                    posicao_atual.style.borderColor = 'red'
+                } else {
+                    
+                    posicao_atual.style.padding = padding_atual
+                    posicao_atual.style.border= '0px'
+                    posicao_atual.className = posicao_atual.className.replace(` ${CLASSE_MARCACAO_POSIC_HOVER}`, '')
+                }
+            })
+
             tabuleiro.appendChild(posicao_atual)
         }
     }
     
     colocar_pecas_no_tabuleiro(tabuleiro)
+    redimensionar_tabuleiro(tabuleiro, Math.min(800, container_pai.offsetWidth))
     return tabuleiro
 }
 
@@ -71,6 +113,9 @@ function inicializar_props_tabuleiro(tabuleiro) {
     tabuleiro.posicao_inicial = null
     tabuleiro.em_xeque = false
     tabuleiro.posicao_peao_que_movimentou_duas_para_frente = null
+    window.addEventListener('resize', () => {
+        redimensionar_tabuleiro(tabuleiro, tabuleiro.offsetWidth)
+    })
 }
 
 function coletar_posicao(linha, coluna, tabuleiro) {
@@ -347,6 +392,8 @@ function marcar_posicao_inicial(posicao) {
 }
 
 function marcar_posicao_alcancavel(posicao) {
+    posicao.style.border = `${padding_atual} solid red`
+    posicao.style.padding = '0px'
     posicao.className += ` ${CLASSE_MARCACAO_POSIC_ALCANCAVEL}`
 }
 
@@ -366,6 +413,11 @@ function eh_posicao_inicial_valida(posicao, tabuleiro) {
 }
 
 function desmarcar_posicao(posicao) {
+    if (posicao.className.indexOf(CLASSE_MARCACAO_POSIC_ALCANCAVEL) != -1) {
+        posicao.style.padding = padding_atual
+        posicao.style.border = '0px'
+    }
+
     let re = new RegExp(`${CLASSE_MARCACAO_POSIC_ALCANCAVEL}|${CLASSE_MARCACAO_POSIC_INICIAL}`)
     posicao.className = posicao.className.replace(re, "")
 }

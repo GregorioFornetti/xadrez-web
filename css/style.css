@@ -12,23 +12,24 @@ body {
     background-color: rgb(240, 240, 240);
 }
 
+#main-container {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto;
+}
+
 .tabuleiro {
     display: grid;
-    gap: calc(var(--tam-padding-posicoes) * 2);
-    width: fit-content;
+    grid-template-columns: auto auto auto auto auto auto auto auto;
+    width: 100%;
+    max-width: 800px;
     margin: auto;
 }
 
 .posicao {
-    width: 100%;
-    height: 100%;
-    padding: var(--tam-padding-posicoes);
-}
-
-.posicao:hover {
-    cursor: pointer;
-    padding: 0px;
-    border: var(--tam-padding-posicoes) solid gray;
+    width: 90%;
+    height: 90%;
+    padding: 5%;
 }
 
 .posicao-preta {
@@ -52,9 +53,8 @@ body {
     background-color: rgb(189, 173, 28);
 }
 
-.posicao-alcancavel {
-    padding: 0px;
-    border: var(--tam-padding-posicoes) solid blue;
+.posicao:hover {
+    cursor: pointer;
 }
 
 .modal {
@@ -123,11 +123,23 @@ body {
 }
 
 
+.placar {
+    height: 400px;
+    width: 100%;
+    background-color: red;
+}
+
+/*
 @media (min-width: 769px) {
     .tabuleiro {
         grid-template-columns: var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande);
 
         grid-template-rows: var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande) var(--tam-grande);
+    }
+
+    #main-container {
+        grid-template-columns: 40% 60%;
+        grid-template-rows: 100%;
     }
 }
 
@@ -162,3 +174,4 @@ body {
         grid-template-rows: var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno) var(--tam-extra-extra-pequeno);
     }
 }
+*/
