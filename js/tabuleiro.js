@@ -102,7 +102,8 @@ function criar_tabuleiro(container_pai) {
     }
     
     colocar_pecas_no_tabuleiro(tabuleiro)
-    redimensionar_tabuleiro(tabuleiro, Math.min(800, container_pai.offsetWidth))
+    container_pai.appendChild(tabuleiro)
+    redimensionar_tabuleiro(tabuleiro, tabuleiro.offsetWidth)
     return tabuleiro
 }
 

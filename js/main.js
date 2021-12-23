@@ -1,8 +1,8 @@
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    let tabuleiro = criar_tabuleiro(document.querySelector('#main-container'))
-    document.querySelector('#main-container').appendChild(tabuleiro)
+    let main_container = document.querySelector('#main-container')
+    let tabuleiro = criar_tabuleiro(main_container)
     
     tabuleiro.addEventListener("mudanca", () => {
         console.log("SALVE JOGADA")
@@ -41,4 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.body.appendChild(modal)
     })
+
+    //let placar = criar_placar(main_container)
 })

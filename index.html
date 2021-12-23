@@ -8,12 +8,95 @@
     <script src='js/cor.js'></script>
     <script src='js/pecas.js'></script>
     <script src='js/tabuleiro.js'></script>
+    <script src='js/placar.js'></script>
     <script src='js/main.js'></script>
     <title>Xadrez para web</title>
 </head>
 <body>
     <div id='main-container'>
-        
+        <div class='placar'>
+            <div class='placar-container placar-container-half-left'>
+                <div class='placar-box-small'>
+                    <div class='placar-box-top'>
+                        Jogada n°
+                    </div>
+                    <div class='placar-box-bottom'>
+                        1
+                    </div>
+                </div>
+            </div>
+
+            <div class='placar-container placar-container-half-right'>
+                <div class='placar-box-small'>
+                    <div class='placar-box-top'>
+                        Vez das
+                    </div>
+                    <div class='placar-box-bottom'>
+                        Pretas
+                    </div>
+                </div>
+            </div>
+
+            <div class='placar-container placar-container-full'>
+                <div class='placar-box-big'>
+                    <div class='placar-box-top'>
+                        Peças brancas
+                    </div>
+                    <div style='color:black' class='placar-box-bottom placar-pecas-container'>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/peao-branco.png'>
+                            <div class='placar-texto-qnt-pecas'>8</div>
+                        </div>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/cavalo-branco.png'>
+                            <div class='placar-texto-qnt-pecas'>2</div>
+                        </div>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/bispo-branco.png'>
+                            <div class='placar-texto-qnt-pecas'>2</div>
+                        </div>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/torre-branco.png'>
+                            <div class='placar-texto-qnt-pecas'>2</div>
+                        </div>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/dama-branco.png'>
+                            <div class='placar-texto-qnt-pecas'>1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='placar-container placar-container-full'>
+                <div class='placar-box-big'>
+                    <div class='placar-box-top'>
+                        Peças pretas
+                    </div>
+                    <div class='placar-box-bottom placar-pecas-container'>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/peao-preto.png'>
+                            <div class='placar-texto-qnt-pecas'>8</div>
+                        </div>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/cavalo-preto.png'>
+                            <div class='placar-texto-qnt-pecas'>2</div>
+                        </div>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/bispo-preto.png'>
+                            <div class='placar-texto-qnt-pecas'>2</div>
+                        </div>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/torre-preto.png'>
+                            <div class='placar-texto-qnt-pecas'>2</div>
+                        </div>
+                        <div class='placar-box-peca'>
+                            <img src='sprites/dama-preto.png'>
+                            <div class='placar-texto-qnt-pecas'>1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
