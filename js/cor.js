@@ -2,9 +2,14 @@
 const COR_BRANCA = 0
 const COR_PRETA = 1
 const CORES_EM_STRING = ["branco", "preto"]
+const CORES_EM_STRING_PLURAL = ["brancas", "pretas"]
 
 function cor_para_string(cor) {
     return CORES_EM_STRING[cor]
+}
+
+function cor_para_string_plural(cor) {
+    return CORES_EM_STRING_PLURAL[cor]
 }
 
 function verificar_cor_valida(cor) {

@@ -627,3 +627,39 @@ function reiniciar_tabuleiro(tabuleiro) {
     remover_pecas_tabuleiro(tabuleiro)
     colocar_pecas_no_tabuleiro(tabuleiro)
 }
+
+
+function coletar_qnt_pecas(tabuleiro, cor) {
+    let qnt_pecas = {
+        "peao" : 0,
+        "cavalo" : 0,
+        "bispo" : 0,
+        "torre" : 0,
+        "dama" : 0
+    }
+    for (let posicao of tabuleiro.children) {
+        if (!eh_posicao_livre(posicao.linha, posicao.coluna, tabuleiro) && coletar_peca(posicao.linha, posicao.coluna, tabuleiro).cor == cor) {
+            if (eh_peao(coletar_peca(posicao.linha, posicao.coluna, tabuleiro))) {
+                qnt_pecas['peao']++
+            } else if (eh_cavalo(coletar_peca(posicao.linha, posicao.coluna, tabuleiro))) {
+                qnt_pecas['cavalo']++
+            } else if (eh_bispo(coletar_peca(posicao.linha, posicao.coluna, tabuleiro))) {
+                qnt_pecas['bispo']++
+            } else if (eh_torre(coletar_peca(posicao.linha, posicao.coluna, tabuleiro))) {
+                qnt_pecas['torre']++
+            } else if (eh_dama(coletar_peca(posicao.linha, posicao.coluna, tabuleiro))) {
+                qnt_pecas['dama']++
+            }
+        }
+    }
+    return qnt_pecas
+}
+
+function coletar_status_tabuleiro(tabuleiro) {
+    return {
+        "num_jogada" : tabuleiro.qnt_jogadas + 1,
+        "cor_jogador_atual" : tabuleiro.cor_jogador_atual,
+        "qnt_pecas_brancas" : coletar_qnt_pecas(tabuleiro, COR_BRANCA),
+        "qnt_pecas_pretas" : coletar_qnt_pecas(tabuleiro, COR_PRETA)
+    }
+}
